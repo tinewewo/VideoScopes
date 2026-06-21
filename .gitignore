@@ -1,4 +1,6 @@
 build/
 *.o
 *.metallib
+AppIcon.icns
+*.iconset
 .DS_Store

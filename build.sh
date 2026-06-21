@@ -43,9 +43,18 @@ fi
 echo ">> Compiling Swift sources..."
 swiftc "${SWIFT_FLAGS[@]}" Sources/*.swift ${EXTRA_OBJ[@]+"${EXTRA_OBJ[@]}"} -o "$BIN"
 
+# generate the app icon (.icns) from Tools/make_icon.swift if it is not present
+if [ ! -f AppIcon.icns ] && [ -f Tools/make_icon.swift ]; then
+  echo ">> Generating app icon..."
+  rm -rf /tmp/VideoScopes.iconset
+  swift Tools/make_icon.swift /tmp/VideoScopes.iconset >/dev/null 2>&1 \
+    && iconutil -c icns /tmp/VideoScopes.iconset -o AppIcon.icns 2>/dev/null || true
+fi
+
 echo ">> Assembling app bundle..."
 cp Info.plist "$APP/Contents/Info.plist"
 cp Resources/Shaders.metal "$RES/Shaders.metal"
+[ -f AppIcon.icns ] && cp AppIcon.icns "$RES/AppIcon.icns"
 
 echo ">> Ad-hoc code signing..."
 codesign --force --sign - "$APP" >/dev/null 2>&1 || true
