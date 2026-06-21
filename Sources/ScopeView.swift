@@ -51,7 +51,8 @@ final class ScopeRenderer: NSObject, MTKViewDelegate {
             blit.endEncoding()
         }
 
-        var p = engine.makeParams(dstW: iw, dstH: ih, mode: kind.mode,
+        let mode: UInt32 = (kind == .vectorscope && engine.showSkinTargets) ? 1 : kind.mode
+        var p = engine.makeParams(dstW: iw, dstH: ih, mode: mode,
                                   gain: kind.gain(srcW: engine.srcW, srcH: engine.srcH))
         let (scatterPS, resolvePS) = engine.pipelines(for: kind)
 

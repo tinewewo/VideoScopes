@@ -31,7 +31,8 @@ final class MetalEngine {
     private var matrix: UInt32 = 1
     private var range: UInt32 = 0
     private var srcFormat: PixelFormat = .uyvy
-    var vectorGain: Float = 1.0     // vectorscope magnification, set from the UI (main thread)
+    var vectorGain: Float = 1.0       // vectorscope magnification, set from the UI (main thread)
+    var showSkinTargets: Bool = false // CDM12 skin-tone targets on the vectorscope I-line
 
     // triple-buffered upload to avoid CPU/GPU overwrite races
     private var srcBuffers: [MTLBuffer?] = [nil, nil, nil]

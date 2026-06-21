@@ -289,6 +289,19 @@ kernel void resolve_vector(constant ScopeParams           &p      [[buffer(0)]],
     if (perp < 0.7 && along > 0.0 && along < 0.42 * (float)p.dstW && fmod(along, 12.0) < 7.0)
         col = max(col, float3(0.30, 0.36, 0.32));
 
+    // CDM12 skin-tone reference targets along the I-line (toggle: mode == 1)
+    if (p.mode == 1u) {
+        const float radii[4] = { 0.09, 0.15, 0.21, 0.27 };
+        for (uint i = 0u; i < 4u; ++i) {
+            float m = radii[i] * S;
+            float bdx = fabs((float)gid.x - (cx + idir.x * m));
+            float bdy = fabs((float)gid.y - (cy + idir.y * m));
+            float bs = 3.5;
+            if (bdx < bs && bdy < bs && (bdx > bs - 1.4 || bdy > bs - 1.4))
+                col = max(col, float3(0.95, 0.62, 0.45));   // skin/peach tint
+        }
+    }
+
     uint c = accum[gid.y * p.dstW + gid.x];
     if (c > 0u) {
         float inten = saturate(log2(1.0 + (float)c) * p.gain);
