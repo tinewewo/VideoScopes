@@ -133,8 +133,10 @@ final class ScopeContainerView: NSView {
         }
         // current magnification indicator
         let g = MetalEngine.shared.vectorGain
-        label(String(format: "gain ×%.2g", g), NSColor(white: 0.82, alpha: 1), 11)
-            .draw(at: NSPoint(x: r.minX + 8, y: r.maxY - 18))
+        if g > 1.001 {
+            label(String(format: "gain ×%g", g), NSColor(white: 0.82, alpha: 1), 11)
+                .draw(at: NSPoint(x: r.minX + 8, y: r.maxY - 18))
+        }
     }
 
     func refreshOverlay() { overlay.needsDisplay = true }

@@ -126,15 +126,14 @@ final class AppController: NSObject {
             toggles[kind] = cb
             row.addArrangedSubview(cb)
 
-            // vectorscope: variable magnification slider on its own row
+            // vectorscope magnification segments on its own row
             if kind == .vectorscope {
-                let slider = NSSlider(value: 1.0, minValue: 1.0, maxValue: 5.0,
-                                      target: self, action: #selector(vectorGainSlider(_:)))
-                slider.isContinuous = true
-                slider.toolTip = "Vectorscope magnification ×1–×5 (≈×2 for DSC ChromaDuMonde)"
-                slider.translatesAutoresizingMaskIntoConstraints = false
-                slider.widthAnchor.constraint(equalToConstant: 100).isActive = true
-                row.addArrangedSubview(slider)
+                let seg = NSSegmentedControl(labels: ["×1", "×2", "×5"], trackingMode: .selectOne,
+                                             target: self, action: #selector(vectorGainChanged(_:)))
+                seg.selectedSegment = 0
+                seg.toolTip = "Vectorscope magnification — ×2 for DSC ChromaDuMonde (CDM12) charts"
+                seg.setContentHuggingPriority(.required, for: .horizontal)
+                row.addArrangedSubview(seg)
             }
 
             row.translatesAutoresizingMaskIntoConstraints = false
@@ -230,8 +229,12 @@ final class AppController: NSObject {
         controlWindow.level = (sender.state == .on) ? .floating : .normal
     }
 
-    @objc private func vectorGainSlider(_ sender: NSSlider) {
-        engine.vectorGain = Float(sender.doubleValue)
+    @objc private func vectorGainChanged(_ sender: NSSegmentedControl) {
+        switch sender.selectedSegment {
+        case 1:  engine.vectorGain = 2.0
+        case 2:  engine.vectorGain = 5.0
+        default: engine.vectorGain = 1.0
+        }
         scopes[.vectorscope]?.container.refreshOverlay()
     }
 
