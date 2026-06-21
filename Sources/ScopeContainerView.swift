@@ -53,13 +53,25 @@ final class ScopeContainerView: NSView {
     // called by the overlay (draws into the overlay's graphics context)
     fileprivate func drawScales() {
         let r = scopeView.frame
+        let s = kind.internalSize
         switch kind {
         case .waveform:    drawVScale(r)
         case .parade:      drawVScale(r); drawParadeLabels(r)
         case .histogram:   drawHScale(r); drawLegend(at: NSPoint(x: r.maxX - 56, y: r.maxY - 14))
-        case .vectorscope: drawVectorLabels(r)
-        case .diamond:     drawDiamondLabels(r)
+        case .vectorscope: drawVectorLabels(aspectRect(r, 1.0))
+        case .diamond:     drawDiamondLabels(aspectRect(r, CGFloat(s.w) / CGFloat(s.h)))
         case .arrowhead:   drawArrowheadScale(r)
+        }
+    }
+
+    // the letterboxed content rectangle for an aspect-preserving scope
+    private func aspectRect(_ r: NSRect, _ ar: CGFloat) -> NSRect {
+        if r.width / r.height > ar {          // pillarbox (bars left/right)
+            let w = r.height * ar
+            return NSRect(x: r.midX - w / 2, y: r.minY, width: w, height: r.height)
+        } else {                              // letterbox (bars top/bottom)
+            let h = r.width / ar
+            return NSRect(x: r.minX, y: r.midY - h / 2, width: r.width, height: h)
         }
     }
 

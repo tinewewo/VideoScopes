@@ -471,10 +471,10 @@ kernel void resolve_arrowhead(constant ScopeParams           &p      [[buffer(0)
 
 struct VSOut { float4 pos [[position]]; float2 uv; };
 
-vertex VSOut blit_vertex(uint vid [[vertex_id]]) {
+vertex VSOut blit_vertex(uint vid [[vertex_id]], constant float2 &scale [[buffer(0)]]) {
     float2 p[3] = { float2(-1.0, -1.0), float2(3.0, -1.0), float2(-1.0, 3.0) };
     VSOut o;
-    o.pos = float4(p[vid], 0.0, 1.0);
+    o.pos = float4(p[vid] * scale, 0.0, 1.0);   // scale<1 letterboxes to preserve aspect
     o.uv  = float2((p[vid].x + 1.0) * 0.5, 1.0 - (p[vid].y + 1.0) * 0.5);
     return o;
 }

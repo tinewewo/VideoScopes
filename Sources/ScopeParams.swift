@@ -36,6 +36,15 @@ enum ScopeKind: Int, CaseIterable {
         }
     }
 
+    // keep the scope's intended aspect (letterbox) instead of stretching to fill —
+    // matters in full screen, where window aspect constraints don't apply
+    var preservesAspect: Bool {
+        switch self {
+        case .vectorscope, .diamond: return true
+        default:                     return false
+        }
+    }
+
     // internal render resolution of the scope (scaled to the window on blit)
     var internalSize: (w: Int, h: Int) {
         switch self {

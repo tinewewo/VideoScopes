@@ -76,10 +76,21 @@ final class ScopeRenderer: NSObject, MTKViewDelegate {
             c2.endEncoding()
         }
 
-        // 4. blit the scope output onto the view drawable (scaled to fit)
+        // 4. blit the scope output onto the view drawable.
+        // For aspect-sensitive scopes (vectorscope, diamond) letterbox instead of
+        // stretching, so they stay undistorted in full screen.
+        var scale = SIMD2<Float>(1, 1)
+        if kind.preservesAspect {
+            let dw = Float(view.drawableSize.width), dh = Float(view.drawableSize.height)
+            if dw > 0, dh > 0 {
+                let ad = dw / dh, ar = Float(iw) / Float(ih)
+                if ad > ar { scale.x = ar / ad } else { scale.y = ad / ar }
+            }
+        }
         rpd.colorAttachments[0].loadAction = .clear
         if let r = cmd.makeRenderCommandEncoder(descriptor: rpd) {
             r.setRenderPipelineState(engine.psBlit)
+            r.setVertexBytes(&scale, length: MemoryLayout<SIMD2<Float>>.stride, index: 0)
             r.setFragmentTexture(outTex, index: 0)
             r.drawPrimitives(type: .triangle, vertexStart: 0, vertexCount: 3)
             r.endEncoding()
