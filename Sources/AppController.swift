@@ -184,6 +184,7 @@ final class AppController: NSObject {
     private func rebuildSources() {
         descriptors = [("Test pattern (75% bars)", { TestPatternSource() })]
         descriptors.append(contentsOf: DeckLinkSource.availableDevices())
+        descriptors.append(contentsOf: CameraSource.availableDevices())
         sourcePopup.removeAllItems()
         sourcePopup.addItems(withTitles: descriptors.map { $0.name })
     }

@@ -119,6 +119,21 @@ kernel void convert_v210(device const uint        *src    [[buffer(0)]],
     dst.write(float4(rgb, Yn), gid);
 }
 
+// 8-bit BGRA (webcams / AVFoundation). Already display R'G'B'; just normalise.
+kernel void convert_bgra(device const uchar      *src    [[buffer(0)]],
+                         constant ScopeParams     &p      [[buffer(1)]],
+                         texture2d<float, access::write> dst [[texture(0)]],
+                         uint2 gid [[thread_position_in_grid]]) {
+    if (gid.x >= p.srcW || gid.y >= p.srcH) return;
+    uint base = gid.y * p.srcRowBytes + gid.x * 4u;   // B, G, R, A
+    float b = (float)src[base + 0] / 255.0;
+    float g = (float)src[base + 1] / 255.0;
+    float r = (float)src[base + 2] / 255.0;
+    float2 k = luma_coeffs(p.matrix);
+    float y = k.x * r + (1.0 - k.x - k.y) * g + k.y * b;
+    dst.write(float4(r, g, b, y), gid);
+}
+
 // ---------------------------------------------------------------------------
 // Scatter passes: accumulate pixel density into a uint buffer (atomic add).
 // ---------------------------------------------------------------------------

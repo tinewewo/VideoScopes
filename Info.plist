@@ -26,5 +26,9 @@
     <string>NSApplication</string>
     <key>LSApplicationCategoryType</key>
     <string>public.app-category.video</string>
+    <key>NSCameraUsageDescription</key>
+    <string>VideoScopes analyses the live video from the selected camera.</string>
+    <key>NSCameraUseContinuityCameraDeviceType</key>
+    <true/>
 </dict>
 </plist>

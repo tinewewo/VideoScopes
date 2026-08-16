@@ -3,6 +3,7 @@ import Foundation
 enum PixelFormat {
     case uyvy    // 8-bit 4:2:2  (BMD bmdFormat8BitYUV / '2vuy')
     case v210    // 10-bit 4:2:2 (BMD bmdFormat10BitYUV / 'v210')
+    case bgra    // 8-bit BGRA   (webcams / AVFoundation)
 }
 
 struct VideoFrame {

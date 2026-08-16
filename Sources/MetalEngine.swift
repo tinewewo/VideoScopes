@@ -11,6 +11,7 @@ final class MetalEngine {
 
     let psConvertUYVY: MTLComputePipelineState
     let psConvertV210: MTLComputePipelineState
+    let psConvertBGRA: MTLComputePipelineState
     let psScatterWaveform: MTLComputePipelineState
     let psScatterVector: MTLComputePipelineState
     let psScatterHist: MTLComputePipelineState
@@ -70,6 +71,7 @@ final class MetalEngine {
         }
         psConvertUYVY     = cps("convert_uyvy")
         psConvertV210     = cps("convert_v210")
+        psConvertBGRA     = cps("convert_bgra")
         psScatterWaveform = cps("scatter_waveform")
         psScatterVector   = cps("scatter_vector")
         psScatterHist     = cps("scatter_hist")
@@ -153,7 +155,13 @@ final class MetalEngine {
 
         guard let cmd = queue.makeCommandBuffer(),
               let enc = cmd.makeComputeCommandEncoder() else { frameSemaphore.signal(); return }
-        enc.setComputePipelineState(srcFormat == .v210 ? psConvertV210 : psConvertUYVY)
+        let convertPS: MTLComputePipelineState
+        switch srcFormat {
+        case .v210: convertPS = psConvertV210
+        case .bgra: convertPS = psConvertBGRA
+        case .uyvy: convertPS = psConvertUYVY
+        }
+        enc.setComputePipelineState(convertPS)
         enc.setBuffer(buf, offset: 0, index: 0)
         var p = makeParams(dstW: 0, dstH: 0, mode: 0, gain: 0)
         enc.setBytes(&p, length: MemoryLayout<ScopeParams>.stride, index: 1)
